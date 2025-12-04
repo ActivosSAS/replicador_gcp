@@ -13,6 +13,7 @@ import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.Session;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -75,6 +76,15 @@ public class JmsConfig {
             factory.setConnectionFactory(connectionFactory);
             factory.setDestinationResolver(destinationResolver());
             factory.setSessionTransacted(true);
+
+            // Configuración de concurrencia
+            factory.setConcurrency("5-20");  // Mínimo 5, máximo 20 consumidores
+            factory.setMaxMessagesPerTask(50);  // Procesar 50 mensajes por tarea
+
+            // Optimización de rendimiento
+           // factory.setReceiveTimeout(1000L);  // 1 segundo de timeout
+            factory.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
+
             return factory;
         }
 
