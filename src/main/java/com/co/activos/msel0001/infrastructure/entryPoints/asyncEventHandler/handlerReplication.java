@@ -19,7 +19,7 @@ public class handlerReplication {
     private static final Logger logger = LoggerFactory.getLogger(handlerReplication.class);
     private final StrategyReplicationUseCase replicationUseCase;
 
-    //@JmsListener(destination = "sq_replication", containerFactory = "jmsListenerContainerFactory" , concurrency = "5-20")
+    @JmsListener(destination = "sq_replication", containerFactory = "jmsListenerContainerFactory" , concurrency = "5-20")
     public void onMessage(String message) {
         long startTime = System.currentTimeMillis();
         logger.info("Received message: {} ", message);
