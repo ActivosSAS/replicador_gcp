@@ -7,6 +7,7 @@ public class UserDocumentaryConverter {
 
     public static UserDocumentaryReviewData toUserDocumentaryReviewData(UserDocumentaryReview userDocumentaryReview) {
         return UserDocumentaryReviewData.builder()
+                .firestoreId(userDocumentaryReview.getId())
                 .id(userDocumentaryReview.getId())
                 .userId(userDocumentaryReview.getUserId())
                 .requisitionNumber(userDocumentaryReview.getRequisitionNumber())
@@ -16,7 +17,7 @@ public class UserDocumentaryConverter {
 
     public static UserDocumentaryReview toUserDocumentaryReview(UserDocumentaryReviewData userDocumentaryReviewData) {
         return UserDocumentaryReview.builder()
-                .id(userDocumentaryReviewData.getId())
+                .id(userDocumentaryReviewData.getFirestoreId())
                 .userId(userDocumentaryReviewData.getUserId())
                 .requisitionNumber(userDocumentaryReviewData.getRequisitionNumber())
                 .updateDate(userDocumentaryReviewData.getUpdateDate())

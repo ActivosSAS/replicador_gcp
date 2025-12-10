@@ -18,11 +18,12 @@ import java.io.Serializable;
 public class RequisitionData implements Serializable {
 
     @DocumentId
-    private  String id;
-    private  String userId;
-    private  String requisitionNumber;
-    private  String deliveryDate;
-    private  String requestDate;
-    private  String selectionStatus;
-    private  String status;
+    private String firestoreId;
+    private String id;
+    private String userId;
+    private String requisitionNumber;
+    private String deliveryDate;
+    private String requestDate;
+    private String selectionStatus;
+    private String status;
 }

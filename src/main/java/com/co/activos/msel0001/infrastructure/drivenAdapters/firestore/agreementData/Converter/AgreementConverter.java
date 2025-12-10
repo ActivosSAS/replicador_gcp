@@ -8,6 +8,7 @@ public class AgreementConverter {
     public static AgreementData buildToData(Agreement agreement) {
         return AgreementData
                 .builder()
+                .firestoreId(agreement.getId())
                 .id(agreement.getId())
                 .agreementId(agreement.getAgreementId())
                 .status(agreement.getStatus())
@@ -18,7 +19,7 @@ public class AgreementConverter {
     public static Agreement buildToDomain(AgreementData agreementData) {
         return Agreement
                 .builder()
-                .id(agreementData.getId())
+                .id(agreementData.getFirestoreId())
                 .agreementId(agreementData.getAgreementId())
                 .status(agreementData.getStatus())
                 .userId(agreementData.getUserId())

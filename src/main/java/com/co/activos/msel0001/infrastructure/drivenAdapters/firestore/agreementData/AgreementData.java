@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class AgreementData implements Serializable {
 
     @DocumentId
+    private String firestoreId;
     private String id;
     private  String userId;
     private  String agreementId;

@@ -2,7 +2,11 @@ package com.co.activos.msel0001.infrastructure.entryPoints.api;
 
 import com.co.activos.msel0001.domain.usecase.StrategyReplicationUseCase;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/replication")
@@ -16,10 +20,13 @@ public class Replication {
         return "Up and running";
     }
 
-    @GetMapping("/{idEvent}")
-    public String replicate(@PathVariable("idEvent") String idEvent) {
-        replicationUseCase.replicate(idEvent);
-        return "Event replicated";
+    @PostMapping
+    public ResponseEntity<String> replicate(@RequestBody List<String> eventIds) {
+        if (eventIds == null || eventIds.isEmpty()) {
+            return ResponseEntity.badRequest().body("No event IDs provided");
+        }
+        eventIds.stream().forEach(replicationUseCase::replicate);
+        return ResponseEntity.ok("Events replicated successfully");
     }
 
 }

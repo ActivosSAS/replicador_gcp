@@ -16,9 +16,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDocumentaryReviewData implements Serializable {
-
     @DocumentId
-    private  String id;
+    private String firestoreId;
+    private String id;
     private  String userId;
     private  String requisitionNumber;
     private  String updateDate;

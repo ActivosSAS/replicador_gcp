@@ -7,6 +7,7 @@ public class RequisitionConverter {
 
     public static RequisitionData toRequisitionData(Requisition requisition) {
         return RequisitionData.builder()
+                .firestoreId(requisition.getId())
                 .id(requisition.getId())
                 .userId(requisition.getUserId())
                 .requisitionNumber(requisition.getRequisitionNumber())
@@ -19,7 +20,7 @@ public class RequisitionConverter {
 
     public static Requisition toRequisition(RequisitionData requisitionData) {
         return Requisition.builder()
-                .id(requisitionData.getId())
+                .id(requisitionData.getFirestoreId())
                 .userId(requisitionData.getUserId())
                 .requisitionNumber(requisitionData.getRequisitionNumber())
                 .deliveryDate(requisitionData.getDeliveryDate())
