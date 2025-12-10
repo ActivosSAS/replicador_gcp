@@ -25,7 +25,6 @@ public class UserData implements Serializable {
     private String ip;
     private boolean agreements;
     private Timestamp updateAt;
-    private Long recruitmentSourceType;
     private Timestamp createdAt;
     private String password;
     private boolean completeDocuments;

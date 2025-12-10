@@ -17,6 +17,7 @@ import java.io.Serializable;
 public class BlockData implements Serializable {
 
     @DocumentId
+    private String firestoreId;
     private String id;
     private String cause;
     private String company;

@@ -8,6 +8,7 @@ public class BlockDataConverter {
     public static BlockData buildToData(Block block) {
         return BlockData
                 .builder()
+                .firestoreId(block.getId())
                 .id(block.getId())
                 .cause(block.getCause())
                 .company(block.getCompany())
@@ -23,7 +24,7 @@ public class BlockDataConverter {
     public static Block buildToDomain(BlockData blockData) {
         return Block
                 .builder()
-                .id(blockData.getId())
+                .id(blockData.getFirestoreId())
                 .cause(blockData.getCause())
                 .company(blockData.getCompany())
                 .companyDocumentNumber(blockData.getCompanyDocumentNumber())
