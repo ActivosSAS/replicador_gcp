@@ -1,5 +1,6 @@
 package com.co.activos.msel0001.domain.usecase;
 
+import com.co.activos.msel0001.domain.exceptions.PersonNotFoundException;
 import com.co.activos.msel0001.domain.exceptions.ReplicationException;
 import com.co.activos.msel0001.domain.model.activos.detailReplication.DetailReplication;
 import com.co.activos.msel0001.domain.model.activos.detailReplication.gateway.DetailReplicationGateway;
@@ -81,12 +82,14 @@ public class StrategyReplicationUseCase {
 
             logger.info("Replicación exitosa - Evento: {}, Estrategia: {}", event, replicateType);
             
+        } catch (PersonNotFoundException e) {
+            handlePersonNotFound(detailRef.get(), e);
         } catch (ReplicationException e) {
             handleReplicationError(detailRef.get(), e);
             logger.error("Error en el proceso de replicación", e);
         } catch (Exception e) {
             handleReplicationError(detailRef.get(), new ReplicationException("Error inesperado durante la replicación: " + e.getMessage(), e));
-           logger.error("Error en el proceso de replicación", e);
+            logger.error("Error en el proceso de replicación", e);
         }
     }
 
@@ -109,8 +112,22 @@ public class StrategyReplicationUseCase {
                 .map(user -> user.toBuilder()
                         .informationToReplicate(detail.getInformationToReplicate())
                         .build())
-                .orElseThrow(() -> new ReplicationException(Errors.NO_BASIC_INFORMATION_FOUND +
+                .orElseThrow(() -> new PersonNotFoundException(Errors.NO_BASIC_INFORMATION_FOUND +
                         detail.getDocumentType() + Errors.AND_DOCUMENT_NUMBER + detail.getDocumentNumber()));
+    }
+
+    private void handlePersonNotFound(DetailReplication detail, PersonNotFoundException e) {
+        logger.warn("Persona no encontrada en el proceso de replicación: {}", e.getMessage());
+        if (detail != null) {
+            try {
+                detailReplicationGateway.updateStatus(detail.toBuilder()
+                        .state(State.NOT_FOUND)
+                        .description(e.getMessage())
+                        .build());
+            } catch (Exception ex) {
+                logger.error("Error actualizando el estado NOT_FOUND de la replicación", ex);
+            }
+        }
     }
 
     private void handleReplicationError(DetailReplication detail, Exception e) {

@@ -4,6 +4,7 @@ public enum State {
 
     PENDING("PENDING"),
     PROCESSED("PROCESSED"),
+    NOT_FOUND("NOT_FOUND"),
     ERROR("ERROR");
 
     private final String value;
