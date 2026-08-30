@@ -13,7 +13,9 @@ public enum ReplicateType {
     REQUISITION_STATUS("7"),
     USER_DOCUMENTARY("4"),
     BASIC_INFORMATION("6"),
-    STATUS_CHANGE("8");
+    STATUS_CHANGE("8"),
+    // TODO: "9" es un placeholder. Confirmar el idConfig real que Oracle va a enviar para este evento.
+    TAG("9");
 
     private final String value;
 
