@@ -22,35 +22,37 @@ import java.util.Optional;
 @Service
 public class TagReplicateUseCase implements StrategyReplication {
 
-    private static final String ACTION_REMOVE = "REMOVE";
+    private static final String DELETE_TRUE = "true";
     private static final int EXPIRATION_MONTHS = 12;
 
     private final Gson gson;
     private final CandidateTagGateway candidateTagGateway;
     private final TagGateway tagGateway;
     private final TagAssignmentGateway tagAssignmentGateway;
+    private final TagRemovalService tagRemovalService;
 
     public TagReplicateUseCase(Gson gson, CandidateTagGateway candidateTagGateway, TagGateway tagGateway,
-            TagAssignmentGateway tagAssignmentGateway) {
+            TagAssignmentGateway tagAssignmentGateway, TagRemovalService tagRemovalService) {
         this.gson = gson;
         this.candidateTagGateway = candidateTagGateway;
         this.tagGateway = tagGateway;
         this.tagAssignmentGateway = tagAssignmentGateway;
+        this.tagRemovalService = tagRemovalService;
     }
 
     @Override
     public void replicate(User information) {
         Tag tagEvent = buildTag(information);
-        CandidateTag candidateTag = candidateTagGateway.findById(tagEvent.getTagId());
+        CandidateTag candidateTag = candidateTagGateway.findById(tagEvent.getTag());
 
         if (candidateTag == null || !Boolean.TRUE.equals(candidateTag.getActive())) {
-            throw new IllegalArgumentException("Tag invalido o inactivo: " + tagEvent.getTagId());
+            throw new IllegalArgumentException("Tag invalido o inactivo: " + tagEvent.getTag());
         }
 
         String userId = information.getId();
 
-        if (ACTION_REMOVE.equalsIgnoreCase(tagEvent.getAction())) {
-            removeTag(userId, tagEvent);
+        if (DELETE_TRUE.equalsIgnoreCase(tagEvent.getDeleteIndicator())) {
+            tagRemovalService.remove(userId, tagEvent.getTag());
         } else {
             addTag(userId, tagEvent);
         }
@@ -70,25 +72,12 @@ public class TagReplicateUseCase implements StrategyReplication {
         List<String> currentTags = new ArrayList<>(
                 Optional.ofNullable(tagGateway.getUserTags(userId)).orElse(new ArrayList<>()));
 
-        if (!currentTags.contains(tagEvent.getTagId())) {
-            currentTags.add(tagEvent.getTagId());
+        if (!currentTags.contains(tagEvent.getTag())) {
+            currentTags.add(tagEvent.getTag());
             tagGateway.updateUserTags(userId, currentTags);
         }
 
         scheduleExpirationIfApplicable(userId, tagEvent);
-    }
-
-    private void removeTag(String userId, Tag tagEvent) {
-        List<String> currentTags = new ArrayList<>(
-                Optional.ofNullable(tagGateway.getUserTags(userId)).orElse(new ArrayList<>()));
-
-        if (currentTags.remove(tagEvent.getTagId())) {
-            tagGateway.updateUserTags(userId, currentTags);
-        }
-
-        // Idempotente: si no habia un TagAssignment pendiente (tag sin vencimiento,
-        // o ya vencido y borrado por TTL) esto es un no-op.
-        tagAssignmentGateway.delete(userId, tagEvent.getTagId());
     }
 
     private void scheduleExpirationIfApplicable(String userId, Tag tagEvent) {
@@ -100,7 +89,7 @@ public class TagReplicateUseCase implements StrategyReplication {
 
         tagAssignmentGateway.save(TagAssignment.builder()
                 .userId(userId)
-                .tagId(tagEvent.getTagId())
+                .tagId(tagEvent.getTag())
                 .expiresAt(expiresOn.atStartOfDay(ZoneOffset.UTC).toInstant())
                 .build());
     }

@@ -43,29 +43,43 @@ class TagReplicateUseCaseTest {
     @Mock
     private TagAssignmentGateway tagAssignmentGateway;
 
+    @Mock
+    private TagRemovalService tagRemovalService;
+
     private Gson gson;
     private User user;
 
+    // Shape real usado por Oracle (RHU.Replication_Detail.DATA_JSON), igual
+    // convencion que el evento de bloqueos: deleteIndicator en vez de action.
     private static final String addJson = "{\n" +
-            "    \"tagId\": \"extrabajador\",\n" +
-            "    \"action\": \"ADD\"\n" +
+            "    \"document_type\": \"CC\",\n" +
+            "    \"document_number\": \"123456\",\n" +
+            "    \"tag\": \"extrabajador\",\n" +
+            "    \"deleteIndicator\": \"false\",\n" +
+            "    \"origin\": \"nomina\"\n" +
             "}";
 
     private static final String removeJson = "{\n" +
-            "    \"tagId\": \"extrabajador\",\n" +
-            "    \"action\": \"REMOVE\"\n" +
+            "    \"document_type\": \"CC\",\n" +
+            "    \"document_number\": \"123456\",\n" +
+            "    \"tag\": \"extrabajador\",\n" +
+            "    \"deleteIndicator\": \"true\",\n" +
+            "    \"origin\": \"nomina\"\n" +
             "}";
 
     private static final String addWithFechaRetiroJson = "{\n" +
-            "    \"tagId\": \"extrabajador\",\n" +
-            "    \"action\": \"ADD\",\n" +
-            "    \"fechaRetiro\": \"2025-08-30\"\n" +
+            "    \"document_type\": \"CC\",\n" +
+            "    \"document_number\": \"123456\",\n" +
+            "    \"tag\": \"extrabajador\",\n" +
+            "    \"fechaRetiro\": \"2025-08-30\",\n" +
+            "    \"deleteIndicator\": \"false\",\n" +
+            "    \"origin\": \"nomina\"\n" +
             "}";
 
     @BeforeEach
     void setUp() {
         gson = new Gson();
-        useCase = new TagReplicateUseCase(gson, candidateTagGateway, tagGateway, tagAssignmentGateway);
+        useCase = new TagReplicateUseCase(gson, candidateTagGateway, tagGateway, tagAssignmentGateway, tagRemovalService);
         user = User.builder()
                 .id("user1")
                 .informationToReplicate(addJson)
@@ -96,17 +110,16 @@ class TagReplicateUseCaseTest {
     }
 
     @Test
-    void removes_tag_when_action_is_remove() {
+    void delegates_removal_when_delete_indicator_true() {
         User removeUser = User.builder().id("user1").informationToReplicate(removeJson).build();
 
         when(candidateTagGateway.findById("extrabajador"))
                 .thenReturn(CandidateTag.builder().id("extrabajador").name("Extrabajador").active(true).build());
-        when(tagGateway.getUserTags("user1")).thenReturn(List.of("extrabajador", "referido"));
 
         useCase.replicate(removeUser);
 
-        verify(tagGateway, times(1)).updateUserTags(eq("user1"), eq(List.of("referido")));
-        verify(tagAssignmentGateway, times(1)).delete("user1", "extrabajador");
+        verify(tagRemovalService, times(1)).remove("user1", "extrabajador");
+        verify(tagGateway, never()).updateUserTags(anyString(), anyList());
     }
 
     @Test

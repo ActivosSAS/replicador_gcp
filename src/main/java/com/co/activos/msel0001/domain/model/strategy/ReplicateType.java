@@ -14,8 +14,9 @@ public enum ReplicateType {
     USER_DOCUMENTARY("4"),
     BASIC_INFORMATION("6"),
     STATUS_CHANGE("8"),
-    // TODO: "9" es un placeholder. Confirmar el idConfig real que Oracle va a enviar para este evento.
-    TAG("9");
+    // idConfig 14 en RHU.Replication_Config (test), status Inactive hasta terminar
+    // el flujo completo. 9, 11, 12 y 13 ya estaban tomados por otros eventos.
+    TAG("14");
 
     private final String value;
 
