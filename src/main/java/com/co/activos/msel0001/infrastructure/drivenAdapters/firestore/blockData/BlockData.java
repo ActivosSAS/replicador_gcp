@@ -27,4 +27,5 @@ public class BlockData implements Serializable {
     private Boolean itBlocks;
     private String lock_type;
     private String userId;
+    private String origin;
 }

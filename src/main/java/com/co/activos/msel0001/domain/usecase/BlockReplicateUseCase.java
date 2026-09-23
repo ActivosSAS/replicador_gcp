@@ -63,6 +63,7 @@ public class BlockReplicateUseCase implements StrategyReplication {
                 .companyDocumentType(newBlock.getCompanyDocumentType())
                 .companyDocumentNumber(newBlock.getCompanyDocumentNumber())
                 .company(newBlock.getCompany())
+                .origin(newBlock.getOrigin())
                 .build();
     }
 

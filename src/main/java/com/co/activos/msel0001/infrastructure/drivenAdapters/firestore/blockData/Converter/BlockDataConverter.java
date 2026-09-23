@@ -18,6 +18,7 @@ public class BlockDataConverter {
                 .itBlocks(block.getItBlocks())
                 .userId(block.getUserId())
                 .lock_type(block.getLock_type())
+                .origin(block.getOrigin())
                 .build();
     }
 
@@ -33,6 +34,7 @@ public class BlockDataConverter {
                 .itBlocks(blockData.getItBlocks())
                 .lock_type(blockData.getLock_type())
                 .userId(blockData.getUserId())
+                .origin(blockData.getOrigin())
                 .build();
     }
 }

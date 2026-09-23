@@ -15,4 +15,5 @@ public class Block {
     private final String lock_type;
     private final Boolean itBlocks;
     private final String userId;
+    private final String origin;
 }

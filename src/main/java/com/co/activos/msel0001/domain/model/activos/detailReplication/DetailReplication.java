@@ -17,4 +17,5 @@ public class DetailReplication {
     private final String documentType;
     private final String documentNumber;
     private final String description;
+    private final String origin;
 }
